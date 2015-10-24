@@ -7,6 +7,10 @@
     "email" : "m8@em8.pl",
     "url" : "http://realtime.guru/"
   },
+  "repository" : {
+    "type" : "git",
+    "url" : "ReactiveObserver/reactiveobserver-knockout"
+  },
   "dependencies":{
     "knockout":">=3.3.0",
     "reactiveobserver-client":">=0.5.0"
