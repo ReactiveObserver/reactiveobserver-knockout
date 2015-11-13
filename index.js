@@ -58,6 +58,12 @@ Observation.prototype.toKoObservableArray = function(observe) {
           return item
         }))
         break
+      case "updateFieldBy":
+        observable(observable().map(function(item){
+          if(JSON.stringify(item[data[0]])==JSON.stringify(data[1])) item[data[2]]=data[3]
+          return item
+        }))
+        break
       case "moveBy":
         var d=observable()
         var pos=-1
