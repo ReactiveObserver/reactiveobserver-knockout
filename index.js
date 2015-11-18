@@ -59,10 +59,17 @@ Observation.prototype.toKoObservableArray = function(observe) {
         }))
         break
       case "updateFieldBy":
-        observable(observable().map(function(item){
-          if(JSON.stringify(item[data[0]])==JSON.stringify(data[1])) item[data[2]]=data[3]
-          return item
-        }))
+        var arr=observable()
+        var id=-1
+        var sd=JSON.stringify(data[1])
+        for(var i=0; i<arr.length; i++) {
+          var item = arr[i]
+          if (JSON.stringify(item[data[0]]) == sd) id = i
+        }
+        if(id!=-1) {
+          arr[id][data[2]]=data[3]
+          observable.splice(id,1,JSON.parse(JSON.stringify(arr[id])))
+        }
         break
       case "moveBy":
         var d=observable()
