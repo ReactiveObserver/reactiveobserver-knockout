@@ -3,6 +3,10 @@ var ko=require('knockout')
 
 var Observation=rapi.reactiveApi.Observation
 
+Observation.prototype.readSymbol = function(s) {
+  return s
+}
+
 Observation.prototype.toKoObservable = function(observe) {
   if(this.koObservable) return this.koObservable
   this.koObservable=ko.observable()
@@ -34,8 +38,8 @@ Observation.prototype.toKoObservableArray = function(observe) {
   if(this.koObservableArray) return this.koObservableArray
   this.koObservableArray=ko.observableArray()
   var observable=this.koObservableArray
-  var observer=function(signal,data) {
-    //console.error(observable,signal,data)
+  var observer=(function(signal,data) {
+  //  console.error('KOARRAY',observable,signal,data)
     switch(signal){
       case 'set': observable(data[0]); break
       case 'pop':
@@ -49,14 +53,14 @@ Observation.prototype.toKoObservableArray = function(observe) {
       case "removeBy":
         observable(observable().filter(function(item) {
           console.log(item,data)
-          return JSON.stringify(item[data[0]]) != JSON.stringify(data[1])
-        }))
+          return JSON.stringify(item[this.readSymbol(data[0])]) != JSON.stringify(data[1])
+        },this))
         break
       case "updateBy":
         observable(observable().map(function(item){
-          if(JSON.stringify(item[data[0]])==JSON.stringify(data[1])) return data[2]
+          if(JSON.stringify(item[this.readSymbol(data[0])])==JSON.stringify(data[1])) return data[2]
           return item
-        }))
+        },this))
         break
       case "updateFieldBy":
         var arr=observable()
@@ -64,10 +68,10 @@ Observation.prototype.toKoObservableArray = function(observe) {
         var sd=JSON.stringify(data[1])
         for(var i=0; i<arr.length; i++) {
           var item = arr[i]
-          if (JSON.stringify(item[data[0]]) == sd) id = i
+          if (JSON.stringify(item[this.readSymbol(data[0])]) == sd) id = i
         }
         if(id!=-1) {
-          arr[id][data[2]]=data[3]
+          arr[id][this.readSymbol(data[2])]=data[3]
           observable.splice(id,1,JSON.parse(JSON.stringify(arr[id])))
         }
         break
@@ -75,7 +79,7 @@ Observation.prototype.toKoObservableArray = function(observe) {
         var d=observable()
         var pos=-1
         for(var i=0; i<d.length; i++) {
-          if(JSON.stringify(d[i][data[0]])==JSON.stringify(data[1])) pos=i
+          if(JSON.stringify(d[i][this.readSymbol(data[0])])==JSON.stringify(data[1])) pos=i
         }
         console.log("F",pos)
         if(pos>=0 && pos<d.length) {
@@ -88,7 +92,7 @@ Observation.prototype.toKoObservableArray = function(observe) {
       default: observable.notifySubscribers(observable(),signal)
     }
     observable()
-  }
+  }).bind(this)
   if(observe) this.addObserver(observer)
   var observations=observe ? 1 : 0
   if(!observe) {
