@@ -50,14 +50,22 @@ Observation.prototype.toKoObservableArray = function(observe) {
       case "unshift":
         observable[signal].apply(observable,data)
         break
+      case "remove":
+        var eds=JSON.stringify(data[0])
+        observable(observable().filter(function(item) {
+         // console.log(item,data)
+          return JSON.stringify(item) != eds
+        },this))
+        break
       case "removeBy":
         observable(observable().filter(function(item) {
-          console.log(item,data)
+        //  console.log(item,data)
           return JSON.stringify(item[this.readSymbol(data[0])]) != JSON.stringify(data[1])
         },this))
         break
       case "updateBy":
         observable(observable().map(function(item){
+         // console.log("UD",this.readSymbol(data[0]),item,JSON.stringify(item[this.readSymbol(data[0])]),JSON.stringify(data[1]))
           if(JSON.stringify(item[this.readSymbol(data[0])])==JSON.stringify(data[1])) return data[2]
           return item
         },this))
@@ -81,7 +89,7 @@ Observation.prototype.toKoObservableArray = function(observe) {
         for(var i=0; i<d.length; i++) {
           if(JSON.stringify(d[i][this.readSymbol(data[0])])==JSON.stringify(data[1])) pos=i
         }
-        console.log("F",pos)
+       // console.log("F",pos)
         if(pos>=0 && pos<d.length) {
           var item=d[pos]
           console.log("!!",pos,data[2],item)
