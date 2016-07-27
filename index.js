@@ -50,6 +50,9 @@ Observation.prototype.toKoObservableArray = function(observe) {
       case "unshift":
         observable[signal].apply(observable,data)
         break
+      case "setElement":
+        observable.splice(data[0],1,data[1])
+        break
       case "remove":
         var eds=JSON.stringify(data[0])
         observable(observable().filter(function(item) {
